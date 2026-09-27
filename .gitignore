@@ -1,0 +1,11 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.env
+.vscode/
+dataset/
+known_faces/
+encodings/
+*.db
+*.sqlite3
