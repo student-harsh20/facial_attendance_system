@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: facial-attendance-system
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PROJECT_NAME
+        value: Facial Attendance System
+      - key: RECOGNITION_COOLDOWN_SECONDS
+        value: 6
+      - key: SIMILARITY_THRESHOLD
+        value: 0.363
+      - key: YUNET_SCORE_THRESHOLD
+        value: 0.6

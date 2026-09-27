@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "public": true,
+  "name": "facial-attendance-frontend",
+  "cleanUrls": true,
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ]
+}

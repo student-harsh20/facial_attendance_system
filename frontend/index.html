@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face Recognition Attendance System</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
+</head>
+<body>
+  <!-- SCREEN 1: MANUAL LOGIN PORTAL (Displayed by default) -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-card-header">
+        <div class="login-brand-icon">👁️</div>
+        <h1 class="login-title">FaceAttend Portal</h1>
+        <p class="login-subtitle">Facial Attendance & Classroom Management System</p>
+      </div>
+
+      <!-- Role Selector -->
+      <div class="login-role-tabs">
+        <button type="button" class="login-role-btn active" data-role-tab="teacher">
+          👨‍🏫 Teacher Login
+        </button>
+        <button type="button" class="login-role-btn" data-role-tab="admin">
+          🛡️ Administrator Login
+        </button>
+      </div>
+
+      <!-- TAB 1: TEACHER LOGIN (Branch, Section, Email, Password) -->
+      <div id="login-tab-teacher" class="login-tab-content active">
+        <p style="font-size: 0.83rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Sign in with your assigned <strong>Branch, Section, Email, and Password</strong>:
+        </p>
+
+        <form id="teacher-login-form">
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="login-teacher-branch">Branch / Department *</label>
+              <select id="login-teacher-branch" class="form-select" required>
+                <option value="">Select Branch</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Civil">Civil</option>
+                <option value="Electrical">Electrical</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="login-teacher-section">Section / Semester *</label>
+              <input type="text" id="login-teacher-section" class="form-input" placeholder="e.g. Semester 6 - Sec A" required />
+            </div>
+          </div>
+
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" for="login-teacher-email">Email Address *</label>
+              <input type="email" id="login-teacher-email" class="form-input" placeholder="e.g. amit.sharma@college.edu" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="login-teacher-pass">Password *</label>
+              <input type="password" id="login-teacher-pass" class="form-input" placeholder="Enter password" required />
+            </div>
+          </div>
+
+          <button type="submit" id="btn-teacher-login-submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-size: 0.95rem; font-weight: 700;">
+            🔑 Log In to Teacher Portal
+          </button>
+        </form>
+
+        <div class="login-info-box">
+          <span class="info-icon">📌</span>
+          <span>Teacher accounts are registered by the Administrator. Sign in with your assigned branch, section, email, and password.</span>
+        </div>
+      </div>
+
+      <!-- TAB 2: ADMIN LOGIN (Email & Password) -->
+      <div id="login-tab-admin" class="login-tab-content">
+        <p style="font-size: 0.83rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Sign in with Administrator credentials to <strong>Add, Edit/Change, and Allocate Teachers</strong>:
+        </p>
+
+        <form id="admin-login-form">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label" for="login-admin-email">Administrator Email *</label>
+            <input type="email" id="login-admin-email" class="form-input" placeholder="e.g. admin@college.edu" autocomplete="username" required />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" for="login-admin-pass">Password *</label>
+            <input type="password" id="login-admin-pass" class="form-input" placeholder="••••••••" autocomplete="current-password" required />
+          </div>
+
+          <button type="submit" id="btn-admin-login-submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem;">
+            🛡️ Log In as Administrator
+          </button>
+        </form>
+
+        <div class="login-security-notice">
+          <span class="security-icon">🔒</span>
+          <span>Restricted system administrator access. Authorized personnel only.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: MAIN DASHBOARD & APPLICATION (Visible only when logged in) -->
+  <div id="app-view" style="display: none;">
+    <!-- Header / Navigation Bar -->
+    <header class="navbar">
+      <div class="brand">
+        <div class="brand-icon">👁️</div>
+        <div>
+          <h1 class="brand-title">FaceAttend</h1>
+          <p class="brand-subtitle">Smart Facial Attendance System</p>
+        </div>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <!-- Teacher Tabs -->
+          <li><button class="nav-btn active" data-tab="dashboard">📊 Dashboard</button></li>
+          <li><button class="nav-btn" data-tab="camera">📹 Gate Camera</button></li>
+          <li><button class="nav-btn" data-tab="add-student">➕ Add Student</button></li>
+          <li><button class="nav-btn" data-tab="students">👥 Student Database</button></li>
+          <!-- Admin Tabs (Activated in Admin role) -->
+          <li><button class="nav-btn" data-tab="admin-teachers" style="display: none;">👨‍🏫 Manage Teachers</button></li>
+          <li><button class="nav-btn" data-tab="admin-overview" style="display: none;">🏛️ Admin Overview</button></li>
+          <!-- Shared Tab -->
+          <li><button class="nav-btn" data-tab="attendance">📋 Attendance Records</button></li>
+        </ul>
+      </nav>
+
+      <!-- Active User Profile & Logout (No switch button) -->
+      <div id="nav-teacher-banner" class="teacher-nav-pill">
+        <div id="nav-user-avatar" class="teacher-pill-avatar">👨‍🏫</div>
+        <div class="teacher-pill-info">
+          <div class="teacher-pill-row1">
+            <span id="nav-teacher-name" class="teacher-pill-name">Dr. Amit Sharma</span>
+            <span id="nav-teacher-subject" class="badge badge-primary">Machine Learning</span>
+          </div>
+          <div id="nav-teacher-class" class="teacher-pill-class">Computer Science &bull; Semester 6 - Sec A</div>
+        </div>
+        <button id="btn-logout" class="btn-logout" title="Sign out and return to Login Screen">
+          🚪 Logout
+        </button>
+      </div>
+
+      <div class="nav-actions">
+        <button id="btn-train-face" class="btn btn-outline btn-sm" title="Synchronize & Retrain Face Encodings Cache">
+          ⚡ Train / Update Face Data
+        </button>
+      </div>
+    </header>
+
+
+  <!-- Main Container -->
+  <main class="container">
+    <!-- TAB 1: DASHBOARD -->
+    <section id="tab-dashboard" class="tab-content active">
+      <div class="section-header">
+        <h2 class="section-title">Overview Dashboard</h2>
+        <span id="stat-today-date" style="font-weight: 600; color: var(--text-muted);">Today</span>
+      </div>
+
+      <!-- Metrics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon primary">👥</div>
+          <div>
+            <div class="stat-label">Total Registered Students</div>
+            <div id="stat-total-students" class="stat-value">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon success">✅</div>
+          <div>
+            <div class="stat-label">Present Today</div>
+            <div id="stat-present-today" class="stat-value">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon info">📈</div>
+          <div>
+            <div class="stat-label">Attendance Rate</div>
+            <div id="stat-attendance-pct" class="stat-value">0%</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon warning">🛡️</div>
+          <div>
+            <div class="stat-label">Duplicate Prevention</div>
+            <div class="stat-value" style="font-size: 1.25rem; color: var(--success); font-weight: 700;">Enforced</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity Table -->
+      <div class="table-card">
+        <div class="table-toolbar">
+          <h3 style="font-size: 1.05rem; font-weight: 700;">Today's Recent Attendance Logs</h3>
+          <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-tab=camera]').click()">
+            Open Live Camera
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Department</th>
+                <th>Subject</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recent-attendance-tbody">
+              <tr>
+                <td colspan="6" class="empty-state">Loading attendance records...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: LIVE GATE CAMERA -->
+    <section id="tab-camera" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Entry Gate Attendance Camera</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Real-time face recognition with per-subject attendance marking and cross-class student verification.
+          </p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <label for="cooldown-slider" style="font-size: 0.85rem; font-weight: 600;">Recognition Cooldown:</label>
+          <input type="range" id="cooldown-slider" min="3" max="15" value="6" style="width: 100px; cursor: pointer;" oninput="document.getElementById('cooldown-val').textContent = this.value + 's'" />
+          <span id="cooldown-val" class="badge badge-info">6s</span>
+        </div>
+      </div>
+
+      <!-- Active Teacher / Subject Session Banner -->
+      <div id="cam-active-teacher-badge" class="cam-teacher-indicator">
+        <div>
+          <span>👨‍🏫 <strong>Active Class Session:</strong> <span class="active-teacher-indicator">Dr. Amit Sharma | Machine Learning (Computer Science - Semester 6 - Sec A)</span></span>
+        </div>
+      </div>
+
+
+      <div class="camera-wrapper">
+        <!-- Camera Panel -->
+        <div class="camera-card">
+          <div class="video-container">
+            <video id="recognition-video" class="video-element" autoplay playsinline muted></video>
+            <canvas id="recognition-canvas" class="overlay-canvas"></canvas>
+            <div id="camera-placeholder" class="camera-placeholder">
+              <div style="font-size: 3rem; margin-bottom: 0.5rem;">📷</div>
+              <h3>Camera is Offline</h3>
+              <p style="font-size: 0.85rem; margin-top: 0.25rem;">Click "Start Camera" to begin attendance marking.</p>
+            </div>
+          </div>
+
+          <!-- Gate Status Banner -->
+          <div id="gate-banner" class="gate-banner idle">
+            <span id="gate-status-text">Camera offline</span>
+            <span id="gate-badge" class="gate-badge">Idle</span>
+          </div>
+
+          <!-- Controls -->
+          <div class="camera-controls">
+            <div>
+              <button id="btn-start-camera" class="btn btn-success" onclick="if(window.CameraController) CameraController.startCamera()">
+                ▶️ Start Camera
+              </button>
+              <button id="btn-stop-camera" class="btn btn-outline" style="display: none;" onclick="if(window.CameraController) CameraController.stopCamera()">
+                ⏹️ Stop Camera
+              </button>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">
+              💡 1 attendance / student / day
+            </span>
+          </div>
+        </div>
+
+        <!-- Live Attendance Feed Sidebar -->
+        <div class="activity-card">
+          <div class="activity-header">
+            <span>Live Activity Feed</span>
+            <span class="badge badge-info">Live</span>
+          </div>
+          <ul id="live-attendance-feed" class="feed-list">
+            <li class="empty-state empty-feed" style="padding: 1.5rem 0;">
+              No students marked in this session yet.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: ADD STUDENT -->
+    <section id="tab-add-student" class="tab-content">
+      <div class="section-header">
+        <h2 class="section-title">Register New Student</h2>
+      </div>
+
+      <div class="form-card">
+        <form id="add-student-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="reg-student-id">Student ID / Roll No *</label>
+              <input type="text" id="reg-student-id" class="form-input" placeholder="e.g. 21CS042" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-name">Full Name *</label>
+              <input type="text" id="reg-name" class="form-input" placeholder="e.g. Rahul Sharma" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-department">Department *</label>
+              <select id="reg-department" class="form-select" required>
+                <option value="">Select Department</option>
+                <option value="Computer Science">Computer Science & Engineering</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics">Electronics & Communication</option>
+                <option value="Mechanical">Mechanical Engineering</option>
+                <option value="Civil">Civil Engineering</option>
+                <option value="Electrical">Electrical Engineering</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-course">Course *</label>
+              <select id="reg-course" class="form-select" required>
+                <option value="">Select Course</option>
+                <option value="B.Tech">B.Tech</option>
+                <option value="BCA">BCA</option>
+                <option value="MCA">MCA</option>
+                <option value="M.Tech">M.Tech</option>
+                <option value="B.Sc">B.Sc</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-semester">Semester / Section *</label>
+              <input type="text" id="reg-semester" class="form-input" placeholder="e.g. Semester 6 - Sec A" required />
+            </div>
+          </div>
+
+          <!-- Face Photo Input -->
+          <div class="photo-input-section">
+            <div class="photo-preview-container">
+              <img id="photo-preview-img" class="photo-preview" src="" alt="Preview" style="display: none;" />
+              <div>
+                <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem;">
+                  Student Face Photograph *
+                </p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+                  Photo must contain <strong>exactly one clearly visible face</strong>. Face embeddings are extracted automatically.
+                </p>
+                <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+                  <label class="btn btn-outline btn-sm" style="cursor: pointer;">
+                    📁 Choose Photo File
+                    <input type="file" id="student-photo-input" accept="image/jpeg,image/png,image/jpg" style="display: none;" />
+                  </label>
+                  <button type="button" id="btn-open-snap-webcam" class="btn btn-outline btn-sm">
+                    📸 Capture from Webcam
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align: right;">
+            <button type="submit" id="btn-register-submit" class="btn btn-primary" style="min-width: 180px;">
+              💾 Register Student
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 4: STUDENT DATABASE -->
+    <section id="tab-students" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Registered Students</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Manage and view registered faces in your department and class.
+          </p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <label style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; background: var(--bg-card); padding: 0.45rem 0.85rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+            <input type="checkbox" id="students-class-filter" checked />
+            <span>My Class Only</span>
+          </label>
+          <input type="text" id="students-search-input" class="search-input" placeholder="🔍 Search Roll No, Name..." />
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Roll No</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Course</th>
+                <th>Semester</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody">
+              <tr>
+                <td colspan="7" class="empty-state">Loading students...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: ATTENDANCE RECORDS & CSV EXPORT -->
+    <section id="tab-attendance" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Attendance Records</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Filtered by class, section, and subject with 1-click CSV download.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button id="btn-refresh-attendance" class="btn btn-outline btn-sm">🔄 Refresh</button>
+          <button id="btn-export-csv" class="btn btn-success btn-sm">📥 Download CSV</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <!-- Filter Toolbar -->
+        <div class="table-toolbar">
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
+            <input type="date" id="att-filter-date" class="form-input" style="padding: 0.45rem 0.65rem;" />
+            <select id="att-filter-dept" class="form-select" style="padding: 0.45rem 0.65rem;">
+              <option value="All">All Departments</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Mechanical">Mechanical</option>
+              <option value="Civil">Civil</option>
+              <option value="Electrical">Electrical</option>
+            </select>
+            <input type="text" id="att-filter-section" class="form-input" placeholder="Section (e.g. Sec A)" style="width: 140px; padding: 0.45rem 0.65rem;" />
+            <select id="att-filter-subject" class="form-select" style="padding: 0.45rem 0.65rem;">
+              <option value="All">All Subjects</option>
+              <option value="Machine Learning">Machine Learning</option>
+              <option value="Database Management Systems">Database Management Systems</option>
+              <option value="DBMS">DBMS</option>
+              <option value="Cloud Computing">Cloud Computing</option>
+              <option value="Embedded Systems">Embedded Systems</option>
+            </select>
+            <select id="att-filter-course" class="form-select" style="padding: 0.45rem 0.65rem; display: none;">
+              <option value="All">All Courses</option>
+            </select>
+            <button id="btn-my-class-att-filters" class="btn btn-outline btn-sm" title="Filter to active teacher's class & subject">
+              🎯 My Class
+            </button>
+            <button id="btn-reset-att-filters" class="btn btn-outline btn-sm" title="Reset all filters">
+              🌐 All Classes
+            </button>
+          </div>
+          <input type="text" id="att-search-input" class="search-input" placeholder="🔍 Search ID or Name..." />
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Department</th>
+                <th>Section</th>
+                <th>Subject</th>
+                <th>Teacher</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-tbody">
+              <tr>
+                <td colspan="9" class="empty-state">Loading attendance records...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: ADMIN TEACHER MANAGEMENT (Visible to Admin) -->
+    <section id="tab-admin-teachers" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">👨‍🏫 Teacher Management & Class Allocation</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Administrator portal to create, modify/change, and allocate classes and subjects to teachers.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button id="btn-admin-refresh-teachers" class="btn btn-outline btn-sm">🔄 Refresh</button>
+          <button id="btn-admin-add-teacher" class="btn btn-primary btn-sm">➕ Add New Teacher</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <!-- Filter Toolbar -->
+        <div class="table-toolbar">
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
+            <select id="admin-teachers-dept-filter" class="form-select" style="padding: 0.45rem 0.65rem;">
+              <option value="All">All Branches</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Mechanical">Mechanical</option>
+              <option value="Civil">Civil</option>
+              <option value="Electrical">Electrical</option>
+            </select>
+          </div>
+          <input type="text" id="admin-teachers-search" class="search-input" placeholder="🔍 Search Teacher, ID, Subject, Email..." />
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Teacher ID</th>
+                <th>Teacher Name</th>
+                <th>Email</th>
+                <th>Branch</th>
+                <th>Section</th>
+                <th>Subject</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-teachers-tbody">
+              <tr>
+                <td colspan="7" class="empty-state">Loading teachers...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 7: ADMIN OVERVIEW (Visible to Admin) -->
+    <section id="tab-admin-overview" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">🏛️ Administrator System Overview</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+            High-level metrics across all departments, faculties, and biometric attendance logs.
+          </p>
+        </div>
+        <span class="badge badge-success" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">🛡️ Administrator Access</span>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon primary">👨‍🏫</div>
+          <div>
+            <div class="stat-label">Total Registered Teachers</div>
+            <div id="admin-stat-teachers" class="stat-value">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon success">👥</div>
+          <div>
+            <div class="stat-label">Total Enrolled Students</div>
+            <div id="admin-stat-students" class="stat-value">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon info">🏛️</div>
+          <div>
+            <div class="stat-label">Academic Branches</div>
+            <div id="admin-stat-departments" class="stat-value">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon warning">📋</div>
+          <div>
+            <div class="stat-label">Today's Attendance Logs</div>
+            <div id="admin-stat-today-att" class="stat-value">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Quick Controls Card -->
+      <div class="table-card" style="padding: 1.5rem;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; font-weight: 700;">Administrative Operations</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Quickly navigate administrative controls or manage academic faculty.
+        </p>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="document.querySelector('[data-tab=admin-teachers]').click()">
+            👨‍🏫 Manage & Edit Teachers
+          </button>
+          <button class="btn btn-outline" onclick="document.querySelector('[data-tab=attendance]').click()">
+            📋 View All Attendance Records
+          </button>
+          <button class="btn btn-outline" onclick="document.getElementById('btn-train-face').click()">
+            ⚡ Synchronize Biometric Encodings
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: View Student Details -->
+  <div id="view-student-modal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Student Profile</h3>
+        <button class="btn btn-outline btn-sm modal-close">&times;</button>
+      </div>
+      <div class="modal-body" style="display: flex; gap: 1.25rem; align-items: center;">
+        <img id="view-modal-photo" src="" alt="Student Photo" style="width: 110px; height: 110px; border-radius: var(--radius-md); object-fit: cover; border: 1px solid var(--border);" />
+        <div>
+          <h4 id="view-modal-name" style="font-size: 1.15rem; margin-bottom: 0.25rem;">—</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Roll No: <strong id="view-modal-id" style="color: var(--text-main);">—</strong></p>
+          <p style="font-size: 0.85rem; margin-bottom: 0.25rem;">Dept: <span id="view-modal-dept">—</span></p>
+          <p style="font-size: 0.85rem; margin-bottom: 0.25rem;">Course: <span id="view-modal-course">—</span></p>
+          <p style="font-size: 0.85rem;">Semester: <span id="view-modal-sem">—</span></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Webcam Snapshot for Registration -->
+  <div id="webcam-modal" class="modal-backdrop">
+    <div class="modal" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Take Face Snapshot</h3>
+        <button id="btn-close-snap-modal" class="btn btn-outline btn-sm">&times;</button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; align-items: center;">
+        <video id="snap-video" autoplay playsinline muted style="width: 100%; border-radius: var(--radius-sm); background: #000;"></video>
+        <canvas id="snap-canvas" style="display: none;"></canvas>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+          Look directly at the camera with clear lighting.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-snap-capture" class="btn btn-primary" style="width: 100%;">
+          📸 Snap Photo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Add New Teacher (Admin Portal) -->
+  <div id="add-teacher-modal" class="modal-backdrop">
+
+    <div class="modal" style="max-width: 540px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">➕ Add New Teacher</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Register a faculty member and assign their Branch, Section, and Subject.
+          </p>
+        </div>
+        <button class="btn btn-outline btn-sm admin-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="admin-add-teacher-form">
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="admin-add-tid">Teacher ID *</label>
+              <input type="text" id="admin-add-tid" class="form-input" placeholder="e.g. T105" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-add-name">Full Name *</label>
+              <input type="text" id="admin-add-name" class="form-input" placeholder="e.g. Dr. Rajesh Kumar" required />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label class="form-label" for="admin-add-email">Email Address *</label>
+            <input type="email" id="admin-add-email" class="form-input" placeholder="e.g. rajesh.kumar@college.edu" required />
+          </div>
+
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="admin-add-dept">Branch / Department *</label>
+              <select id="admin-add-dept" class="form-select" required>
+                <option value="">Select Branch</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Civil">Civil</option>
+                <option value="Electrical">Electrical</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-add-section">Section / Semester *</label>
+              <input type="text" id="admin-add-section" class="form-input" placeholder="e.g. Semester 6 - Sec A" required />
+            </div>
+          </div>
+
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" for="admin-add-subject">Subject Taught *</label>
+              <input type="text" id="admin-add-subject" class="form-input" placeholder="e.g. Artificial Intelligence" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-add-pass">Password *</label>
+              <input type="password" id="admin-add-pass" class="form-input" placeholder="Create password" required />
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline admin-modal-close">Cancel</button>
+            <button type="submit" id="btn-admin-add-submit" class="btn btn-primary">
+              💾 Create Teacher Profile
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Edit / Change Teacher (Admin Portal) -->
+  <div id="edit-teacher-modal" class="modal-backdrop">
+    <div class="modal" style="max-width: 540px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">✏️ Change / Edit Teacher</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Update teacher name, email, department, section, subject, or reset password.
+          </p>
+        </div>
+        <button class="btn btn-outline btn-sm admin-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="admin-edit-teacher-form">
+          <input type="hidden" id="admin-edit-tid" />
+
+          <div style="background: var(--bg-main); padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); margin-bottom: 0.85rem; border: 1px solid var(--border);">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Teacher ID:</span>
+            <strong id="admin-edit-tid-display" style="font-family: monospace; margin-left: 0.4rem; color: var(--primary);">—</strong>
+          </div>
+
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="admin-edit-name">Full Name *</label>
+              <input type="text" id="admin-edit-name" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-edit-email">Email Address *</label>
+              <input type="email" id="admin-edit-email" class="form-input" required />
+            </div>
+          </div>
+
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="admin-edit-dept">Branch / Department *</label>
+              <select id="admin-edit-dept" class="form-select" required>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Civil">Civil</option>
+                <option value="Electrical">Electrical</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-edit-section">Section / Semester *</label>
+              <input type="text" id="admin-edit-section" class="form-input" required />
+            </div>
+          </div>
+
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" for="admin-edit-subject">Subject Taught *</label>
+              <input type="text" id="admin-edit-subject" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-edit-pass">New Password (leave blank to keep current)</label>
+              <input type="password" id="admin-edit-pass" class="form-input" placeholder="Leave empty to keep unchanged" />
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline admin-modal-close">Cancel</button>
+            <button type="submit" id="btn-admin-edit-submit" class="btn btn-primary">
+              💾 Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Alerts Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Face Recognition Attendance System &bull; College Minor Project &bull; Built with FastAPI, OpenCV & SQLAlchemy</p>
+  </footer>
+  </div>
+  <!-- End of #app-view -->
+
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/students.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
+
